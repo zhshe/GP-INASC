@@ -29,7 +29,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
         <param name="traj_topic" type="string" value="/integrated_to_init" />
    <!-- GP-INSAC method parameters-->
    <!-- getParam does not have float type--> 
-        <param name="sector_num" type="int" value="180"/>
+        <param name="sector_num" type="int" value="360"/>
         <param name="seed_radius" type="double" value="5.5"/>
         <param name="seed_lower" type="double" value="-0.5"/>
         <param name="seed_upper" type="double" value="0.5"/>
@@ -37,7 +37,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
         <param name="gp_sigmaF" type="double" value="1.76"/>
         <param name="gp_sigmaN" type="double" value="0.12"/>
         <param name="insac_model" type="double" value="0.2"/>
-        <param name="insac_data" type="double" value="0.9"/>
+        <param name="insac_data" type="double" value="0.8"/>
 
     </node>
 

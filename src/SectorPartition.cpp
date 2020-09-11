@@ -62,7 +62,7 @@ Output: vPointSecIdx, the index of each point in sectors
 Return: none
 Others: none
 *************************************************/
-std::vector<std::vector<GroundFeature> > DivideSector::ComputePointSectorIdxs(pcl::PointCloud<pcl::PointXYZ> vCloud,
+std::vector<std::vector<GroundFeature> > DivideSector::ComputePointSectorIdxs(pcl::PointCloud<pcl::PointXYZ>& vCloud,
 	std::vector<std::vector<int>> & vPointSecIdx) {
 
 	std::vector<std::vector<GroundFeature> > vGroundFeatures;

@@ -83,7 +83,7 @@ public:
 	};
 
 	//compute the corresponding sector section to each point 
-	std::vector<std::vector<GroundFeature> > ComputePointSectorIdxs(pcl::PointCloud<pcl::PointXYZ> vCloud,
+	std::vector<std::vector<GroundFeature> > ComputePointSectorIdxs(pcl::PointCloud<pcl::PointXYZ>& vCloud,
 		std::vector<std::vector<int> > & vPointSecIdx);
 
 	//obtained features

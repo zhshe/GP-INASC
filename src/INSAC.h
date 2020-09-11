@@ -27,7 +27,7 @@ public:
 		//none
 	}
 
-             int iSector_num;
+    int iSector_num;
 	//seed selection thresholds
 	float fDisThr;
 	float fZLower;

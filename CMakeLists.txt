@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(travelable_region)
 
 ## Compile as C++11
-SET(CMAKE_C_COMPILER g++)
+# SET(CMAKE_C_COMPILER g++)
 add_compile_options(-std=c++11)
 # supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -38,6 +38,9 @@ include_directories(
 aux_source_directory(src DIR_SRCS)
 
 ###### build ########
-add_executable(gp_insac ${DIR_SRCS})
-
+add_executable(gp_insac main.cpp ${DIR_SRCS})
 target_link_libraries(gp_insac ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(test_gpr test_gpr.cpp ${DIR_SRCS})
+target_link_libraries(test_gpr ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+

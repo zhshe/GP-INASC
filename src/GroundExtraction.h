@@ -15,6 +15,7 @@
 #include <geometry_msgs/PointStamped.h>
 
 #include <pcl/io/pcd_io.h>
+#include <pcl/io/ply_io.h>
 #include <pcl/point_cloud.h>
 #include <pcl_conversions/pcl_conversions.h>
 
@@ -111,7 +112,7 @@ private:
     int m_iTrajPointNum;
 
     //the sample interval of frames (e.g., 2 means jumping 1 frame, 3 jumps 2 frame)
-    int m_iSampleNum;
+    int m_iSampleNum = 1;
     //sampling
 
     //the history data among a given secs of trajectory points
