@@ -1,6 +1,6 @@
 #ifndef GAUSSIANPROCESSREGRESSION_HXX
 #define GAUSSIANPROCESSREGRESSION_HXX
-
+#include <chrono>
 
 /*************************************************
 Function: GaussianProcessRegression
@@ -343,12 +343,14 @@ Others: none
 template <typename R>
 bool GaussianProcessRegression<R>::Regression(VectorXr & vPredValue, VectorXr & vPredVar, const VectorXr & f_vTestFeatures) {
 
+  auto start = std::chrono::steady_clock::now();
   //get the dimension of the truth value
   vPredValue.resize(m_mTrainTruth.rows());
   vPredValue.setZero();
   vPredVar.resize(m_mTrainTruth.rows());
   vPredVar.setZero();
 
+  std::cout << "regression: "<< m_bTrainFlag << " " ;
   //check whether the model is trained
   if (!m_bTrainFlag && m_iSampleNum)
 	  TrainData();
@@ -363,6 +365,11 @@ bool GaussianProcessRegression<R>::Regression(VectorXr & vPredValue, VectorXr & 
 
   //compute the variance of prediction value
   CompPredictiveVar(vPredVar, f_vTestFeatures);
+  auto end = std::chrono::steady_clock::now();
+  std::chrono::duration<double, std::milli> dur = end - start;
+  std::cout << "train: " << m_mTrainFeatures.cols() << " "
+            << "test: " << f_vTestFeatures.size() << " "
+            << dur.count() << " ms" << std::endl;
 
   return true;
 

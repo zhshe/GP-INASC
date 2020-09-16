@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(travelable_region)
 
 ## Compile as C++11
-SET(CMAKE_C_COMPILER g++)
+# SET(CMAKE_C_COMPILER g++)
 add_compile_options(-std=c++11)
 # supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)

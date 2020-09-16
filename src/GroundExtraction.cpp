@@ -1,5 +1,5 @@
 #include "GroundExtraction.h"
-
+#include <chrono>
 
 /*************************************************
 Function: GroundExtraction
@@ -365,11 +365,14 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
       //get right point clouds from LOAM output
       for(int i = 0; i != vInputCloud.size(); ++i ){
          
-         pcl::PointXYZ oArgPoint;
-         oArgPoint.x = vInputCloud.points[i].z;
-         oArgPoint.y = vInputCloud.points[i].x;
-         oArgPoint.z = vInputCloud.points[i].y;
-         vOneCloud->points.push_back(oArgPoint);
+        if (vInputCloud.points[i].z > -1.53) {
+            continue;
+        }
+        pcl::PointXYZ oArgPoint;
+        oArgPoint.x = vInputCloud.points[i].x;
+        oArgPoint.y = vInputCloud.points[i].y;
+        oArgPoint.z = vInputCloud.points[i].z;
+        vOneCloud->points.push_back(oArgPoint);
 
       }  
 
@@ -377,7 +380,8 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
       //a class to divide point clouds into the given number of sectors
       DivideSector oSectorDivider(m_oGPThrs.iSector_num);
       //compute the corresponding trajectory point
-      pcl::PointXYZ oCurrentTrajP;
+      pcl::PointXYZ oCurrentTrajP(0, 0, -1.73);
+      oSectorDivider.SetOriginPoint(oCurrentTrajP);
       
       //if have corresponding trajectory point (viewpoint)
       if( vTrajHistory.size() ){
@@ -402,6 +406,7 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
       //******************deviding section******************
       //***********and adopt GP-INSAC algorithm*************
       //to a sector
+      auto gp_start = std::chrono::steady_clock::now();
       for (int is = 0; is != oPointSecIdxs.size(); ++is) {
 
           //***********GP algorithm***********
@@ -423,6 +428,7 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
           //looping until there is not new seed to be involved in current sector
           while(bGrowFlag){
                
+               auto start = std::chrono::steady_clock::now();
                //new training vector - NEW input, NEW means the input does not include old one
                Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> vTrainFeaVec;
                Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> vTrainTruVec;
@@ -466,7 +472,13 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
                //refresh the remaining unknown points
                if(GPINSAC.AssignIdx(vOneLoopLabels))
                   bGrowFlag = false;
-    
+                
+                auto end = std::chrono::steady_clock::now();
+                std::chrono::duration<double, std::milli> dur = end - start;
+                // std::cout << "train data: " << GPR.GetTrainData().cols() << "/" << vTrainFeaVec.size()
+                //           << " test  data: " << vTestFeaVec.size()
+                //           << " time: " << dur.count()  << " ms "<< std::endl;
+
           }//end while
 
           //assigment in current sector
@@ -479,6 +491,9 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
       }//end is
   
        //***********boundary extraction***********
+      auto gp_end = std::chrono::steady_clock::now();
+      std::chrono::duration<double, std::milli> dur = gp_end - gp_start;
+      std::cout << "gp time: " << dur.count() << " ms" << std::endl;
 
       //assigment of result in whole point clouds
       std::vector<int> vCloudRes(vOneCloud->points.size(),0);
@@ -514,33 +529,33 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
                   //if point is a ground point
                   if( vCloudRes[i] == 1){
                        //take data
-                       vGroundCloud.push_back(vInputCloud.points[i]);
+                       vGroundCloud.push_back(vOneCloud->points[i]);
                   //if point is an obstacle point
                   }else if(vCloudRes[i] == -1){
                       //take data
-                      vObstacleCloud.push_back(vInputCloud.points[i]);
+                      vObstacleCloud.push_back(vOneCloud->points[i]);
                   //if point is an boundary point
                   }else if(  vCloudRes[i] == 2)
                       //take data
-                      vBoundCloud.push_back(vInputCloud.points[i]);
+                      vBoundCloud.push_back(vOneCloud->points[i]);
 
        }//end for i
 
        //publish ground points
        pcl::toROSMsg(vGroundCloud, vGroundPub);
-       vGroundPub.header.frame_id = "camera_init";
+       vGroundPub.header.frame_id = "velo_link";
        vGroundPub.header.stamp = vLaserData.header.stamp;
        m_oGroundPub.publish(vGroundPub);
 
        //publish ground points
        pcl::toROSMsg(vBoundCloud, vBoundPub);
-       vBoundPub.header.frame_id = "camera_init";
+       vBoundPub.header.frame_id = "velo_link";
        vBoundPub.header.stamp = vLaserData.header.stamp;
        m_oBoundPub.publish(vBoundPub);
 
        //publish obstacle points
        pcl::toROSMsg(vObstacleCloud, vObstaclePub);
-       vObstaclePub.header.frame_id = "camera_init";
+       vObstaclePub.header.frame_id = "velo_link";
        vObstaclePub.header.stamp =vLaserData.header.stamp;
        m_oObstaclePub.publish(vObstaclePub);
 
