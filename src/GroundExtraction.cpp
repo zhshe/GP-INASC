@@ -428,10 +428,10 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
         bool bGrowFlag = true;
         
         auto gp1_start = std::chrono::system_clock::now();
+        auto gpinsac_start = std::chrono::steady_clock::now();
         //looping until there is not new seed to be involved in current sector
         while(bGrowFlag){
             
-        auto gpinsac_start = std::chrono::steady_clock::now();
             //new training vector - NEW input, NEW means the input does not include old one
             Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> vTrainFeaVec;
             Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> vTrainTruVec;
