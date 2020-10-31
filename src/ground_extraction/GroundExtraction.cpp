@@ -513,23 +513,24 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
     //OutputGroundPoints(vGroundCloud, vLaserData.header.stamp);
 }
 
-void GroundExtraction::groundExtract(const pcl::PointCloud<pcl::PointXYZ>& vInputCloud,
+void GroundExtraction::groundExtract(pcl::PointCloud<pcl::PointXYZ>& vInputCloud,
                                      pcl::PointCloud<pcl::PointXYZ>& vGroundCloud,
                                      pcl::PointCloud<pcl::PointXYZ>& vObstacleCloud,
                                      pcl::PointCloud<pcl::PointXYZ>& vBoundCloud) {
     
-    pcl::PointCloud<pcl::PointXYZ>::Ptr vOneCloud(new pcl::PointCloud<pcl::PointXYZ>);
-    //get right point clouds from LOAM output
+    vGroundCloud.clear();
+    vObstacleCloud.clear();
+    vBoundCloud.clear();
+
+
     for(int i = 0; i != vInputCloud.size(); ++i ){
         
-        if (vInputCloud.points[i].z > -1.53) {
+        if (std::isnan(vInputCloud.points[i].x) || std::isnan(vInputCloud.points[i].y) || 
+            std::isnan(vInputCloud.points[i].z)) {
+            
+            vInputCloud.points[i] = pcl::PointXYZ(0, 0, 0);
             continue;
         }
-        pcl::PointXYZ oArgPoint;
-        oArgPoint.x = vInputCloud.points[i].x;
-        oArgPoint.y = vInputCloud.points[i].y;
-        oArgPoint.z = vInputCloud.points[i].z;
-        vOneCloud->points.push_back(oArgPoint);
 
     }  
 
@@ -537,14 +538,12 @@ void GroundExtraction::groundExtract(const pcl::PointCloud<pcl::PointXYZ>& vInpu
     //a class to divide point clouds into the given number of sectors
     DivideSector oSectorDivider(m_oGPThrs.iSector_num);
     //compute the corresponding trajectory point
-    pcl::PointXYZ oCurrentTrajP(0, 0, -1.73);
+    pcl::PointXYZ oCurrentTrajP(0, 0, -1.79);
     oSectorDivider.SetOriginPoint(oCurrentTrajP);
-        
-    //ROS_INFO("Querytime: %f, have trajpoint: %d", vLaserData.header.stamp.toSec(), bCurTrajPFlag);
     
     //preparation
     std::vector<std::vector<int> > oPointSecIdxs;///<point index reorganization according to sectors
-    std::vector<std::vector<GroundFeature> > vGroundFeatures = oSectorDivider.ComputePointSectorIdxs(*vOneCloud, oPointSecIdxs);
+    std::vector<std::vector<GroundFeature> > vGroundFeatures = oSectorDivider.ComputePointSectorIdxs(vInputCloud, oPointSecIdxs);
     
     std::vector<std::vector<int> > vAllGroundRes;///<point value according to oPointSecIdxs
     for (int i = 0; i != vGroundFeatures.size(); ++i) {
@@ -642,10 +641,11 @@ void GroundExtraction::groundExtract(const pcl::PointCloud<pcl::PointXYZ>& vInpu
     //***********boundary extraction***********
     auto gp_end = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> dur = gp_end - gp_start;
-    std::cout << "gp time: " << dur.count() << " ms" << std::endl;
+    std::cout << "gp time: " << dur.count() << " ms  " 
+              << "cloud_size: " << vInputCloud.size() <<  std::endl;
 
     //assigment of result in whole point clouds
-    std::vector<int> vCloudRes(vOneCloud->points.size(),0);
+    std::vector<int> vCloudRes(vInputCloud.points.size(),0);
     //assignment in whole point clouds
     for (int is = 0; is != oPointSecIdxs.size(); ++is) {
         for (int j = 0; j != oPointSecIdxs[is].size(); ++j) {
@@ -659,7 +659,7 @@ void GroundExtraction::groundExtract(const pcl::PointCloud<pcl::PointXYZ>& vInpu
     //new a boundary class
     Boundary oBounder;
     //input the segment labels
-    oBounder.GetSegmentClouds(vOneCloud, vCloudRes);
+    oBounder.GetSegmentClouds(vInputCloud.makeShared(), vCloudRes);
     //compute boundary point
     oBounder.ComputeBoundary();
     //output the boundary cloud
@@ -670,15 +670,15 @@ void GroundExtraction::groundExtract(const pcl::PointCloud<pcl::PointXYZ>& vInpu
         //if point is a ground point
         if( vCloudRes[i] == 1){
             //take data
-            vGroundCloud.push_back(vOneCloud->points[i]);
+            vGroundCloud.push_back(vInputCloud.points[i]);
         //if point is an obstacle point
         }else if(vCloudRes[i] == -1){
             //take data
-            vObstacleCloud.push_back(vOneCloud->points[i]);
+            vObstacleCloud.push_back(vInputCloud.points[i]);
         //if point is an boundary point
         }else if(  vCloudRes[i] == 2)
             //take data
-            vBoundCloud.push_back(vOneCloud->points[i]);
+            vBoundCloud.push_back(vInputCloud.points[i]);
 
     }//end for i
 

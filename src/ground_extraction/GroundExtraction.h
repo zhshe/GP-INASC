@@ -45,7 +45,7 @@ class GroundExtraction{
 public:
     GroundExtraction(ros::NodeHandle & node, 
                      ros::NodeHandle & private_node);
-    void groundExtract(const pcl::PointCloud<pcl::PointXYZ>& cloud_in,
+    void groundExtract(pcl::PointCloud<pcl::PointXYZ>& cloud_in,
                        pcl::PointCloud<pcl::PointXYZ>& cloud_obstacle,
                        pcl::PointCloud<pcl::PointXYZ>& cloud_ground,
                        pcl::PointCloud<pcl::PointXYZ>& cloud_bound);                

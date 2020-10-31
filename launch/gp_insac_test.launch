@@ -19,16 +19,16 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 <launch>
 
 <!-- hesai_time_modifier node in record_pointclouds pkg-->
-    <node name="gp_insac_node" pkg="gp_insac" type="gp_insac_node" output="screen">
+    <node name="gp_insac_node_test" pkg="gp_insac" type="gp_insac_node_test" output="screen">
 
-    <!-- system parameters-->	
+        <!-- system parameters-->	
         <param name="Output_path" type="string" value="/home/zs/zs/gp_insac/data/" />
         <param name="lidar_topic" type="string" value="/kitti/velo/pointcloud" />
-    <!--input parameters-->	
+        <!--input parameters-->	
         <param name="sampling_number"  type="int" value="5" />
         <param name="traj_topic" type="string" value="/integrated_to_init" />
-   <!-- GP-INSAC method parameters-->
-   <!-- getParam does not have float type--> 
+        <!-- GP-INSAC method parameters-->
+        <!-- getParam does not have float type--> 
         <param name="sector_num" type="int" value="360"/>
         <param name="seed_radius" type="double" value="5.5"/>
         <param name="seed_lower" type="double" value="-0.5"/>
