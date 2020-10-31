@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(travelable_region)
+project(gp_insac)
 
 ## Compile as C++11
 # SET(CMAKE_C_COMPILER g++)
@@ -34,10 +34,4 @@ include_directories(
   src
 )
 
-# find .cpp files 
-aux_source_directory(src DIR_SRCS)
-
-###### build ########
-add_executable(gp_insac ${DIR_SRCS})
-
-target_link_libraries(gp_insac ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+add_subdirectory(src)

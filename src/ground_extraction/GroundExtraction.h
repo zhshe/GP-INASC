@@ -42,10 +42,14 @@ typedef struct TrajectoryPoint{
 class GroundExtraction{
 
 public:
-    
     GroundExtraction(ros::NodeHandle & node, 
-                ros::NodeHandle & private_node);                      
+                     ros::NodeHandle & private_node);
+    void groundExtract(const pcl::PointCloud<pcl::PointXYZ>& cloud_in,
+                       pcl::PointCloud<pcl::PointXYZ>& cloud_obstacle,
+                       pcl::PointCloud<pcl::PointXYZ>& cloud_ground,
+                       pcl::PointCloud<pcl::PointXYZ>& cloud_bound);                
 
+private:
     ////**performance function**////
     //set path of output file where you want to put on
     bool GetOutputPath(ros::NodeHandle & private_node);

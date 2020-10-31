@@ -1,12 +1,12 @@
-#include "GroundExtraction.h"
+#include "ground_extraction/GroundExtraction.h"
 
 int main(int argc, char** argv){
 
-  ros::init(argc, argv, "path_finder");
+  ros::init(argc, argv, "gpinsac_node");
   ros::NodeHandle node;
   ros::NodeHandle privateNode("~");
  
-  GroundExtraction Pathfinder(node,privateNode);
+  GroundExtraction ground_extraction(node,privateNode);
 
   ros::spin();
 
