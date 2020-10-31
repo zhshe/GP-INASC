@@ -4,7 +4,7 @@
 #include <cmath>
 #include <chrono>
 #include <ctime>
-#include "GaussianProcess.h"
+#include "ground_extraction/GaussianProcess.h"
 
 int main() {
 

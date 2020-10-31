@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(travelable_region)
+project(gp_insac)
 
-# SET(CMAKE_BUILD_TYPE "Debug")  
-# SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")  
-# SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")  
+SET(CMAKE_BUILD_TYPE "Release")  
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")  
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")  
 
 ## Compile as C++11
 # SET(CMAKE_C_COMPILER g++)
@@ -38,13 +38,4 @@ include_directories(
   src
 )
 
-# find .cpp files 
-aux_source_directory(src DIR_SRCS)
-
-###### build ########
-add_executable(gp_insac main.cpp ${DIR_SRCS})
-target_link_libraries(gp_insac ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-
-add_executable(test_gpr test_gpr.cpp ${DIR_SRCS})
-target_link_libraries(test_gpr ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-
+add_subdirectory(src)

@@ -1,4 +1,6 @@
-build/*
-.vscode/*
-data/*
 .catkin_workspace
+.vscode/*
+build/*
+build_isolated/*
+data/*
+devel_isolated/*
