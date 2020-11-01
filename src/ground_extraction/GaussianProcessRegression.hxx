@@ -350,7 +350,7 @@ bool GaussianProcessRegression<R>::Regression(VectorXr & vPredValue, VectorXr & 
   vPredVar.resize(m_mTrainTruth.rows());
   vPredVar.setZero();
 
-  std::cout << "regression: "<< m_bTrainFlag << " " ;
+  // std::cout << "regression: "<< m_bTrainFlag << " " ;
   //check whether the model is trained
   if (!m_bTrainFlag && m_iSampleNum)
 	  TrainData();
@@ -367,9 +367,9 @@ bool GaussianProcessRegression<R>::Regression(VectorXr & vPredValue, VectorXr & 
   CompPredictiveVar(vPredVar, f_vTestFeatures);
   auto end = std::chrono::steady_clock::now();
   std::chrono::duration<double, std::milli> dur = end - start;
-  std::cout << "train: " << m_mTrainFeatures.cols() << " "
-            << "test: " << f_vTestFeatures.size() << " "
-            << dur.count() << " ms" << std::endl;
+  // std::cout << "train: " << m_mTrainFeatures.cols() << " "
+  //           << "test: " << f_vTestFeatures.size() << " "
+  //           << dur.count() << " ms" << std::endl;
 
   return true;
 
