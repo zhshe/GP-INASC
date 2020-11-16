@@ -1,5 +1,5 @@
 #include <chrono>
-#include "GroundExtraction.h"
+#include "ground_extraction/GroundExtraction.h"
 #include <chrono>
 
 /*************************************************
@@ -38,6 +38,8 @@ GroundExtraction::GroundExtraction(ros::NodeHandle & node,
     
     //get gp-insac related thresholds
     GetGPINSACThrs(private_node);
+
+    
 
     //subscribe (hear) the point cloud topic from laser on right side 
     m_oLaserSuber = node.subscribe(m_sLaserTopic, 2, &GroundExtraction::HandlePointClouds, this);
@@ -104,7 +106,7 @@ bool GroundExtraction::GetLaserTopic(ros::NodeHandle & private_node){
         
     std::string sLaserTopic; 
 
-    if(private_node.getParam("lidar_topic", sLaserTopic)){
+    if(private_node.getParam("lidar_topic_name", sLaserTopic)){
 
         m_sLaserTopic = sLaserTopic;
 
@@ -202,44 +204,48 @@ Others: none
 void GroundExtraction::GetGPINSACThrs(ros::NodeHandle & private_node){
 
      int iSector_num;
-     if(private_node.getParam("sector_num", iSector_num))
+     if(private_node.getParam("gp/sector_num", iSector_num))
         m_oGPThrs.iSector_num = iSector_num;
 
      //seed selection
      double fDisThr;
-     if(private_node.getParam("seed_radius", fDisThr))
+     if(private_node.getParam("gp/seed_radius", fDisThr))
         m_oGPThrs.fDisThr = float(fDisThr);
     
     double fZLower;
-    if(private_node.getParam("seed_lower", fZLower))
+    if(private_node.getParam("gp/seed_lower", fZLower))
         m_oGPThrs.fZLower = float(fZLower);
 
     double fZUpper;
-    if(private_node.getParam("seed_upper", fZUpper))
+    if(private_node.getParam("gp/seed_upper", fZUpper))
         m_oGPThrs.fZUpper = float(fZUpper);
 
     //GP model thresholds
     double dLScale;
-    if(private_node.getParam("gp_lscale", dLScale))
+    if(private_node.getParam("gp/gp_lscale", dLScale))
         m_oGPThrs.dLScale = dLScale;
 
     double dSigmaF;
-    if(private_node.getParam("gp_sigmaF", dSigmaF))
+    if(private_node.getParam("gp/gp_sigmaF", dSigmaF))
         m_oGPThrs.dSigmaF = dSigmaF;
 
     double dSigmaN;
-    if(private_node.getParam("gp_sigmaN", dSigmaN))
+    if(private_node.getParam("gp/gp_sigmaN", dSigmaN))
         m_oGPThrs.dSigmaN = dSigmaN;
 
     //insac thresholds
     double fModelThr;
-    if(private_node.getParam("insac_model", fModelThr))
+    if(private_node.getParam("gp/insac_model", fModelThr))
         m_oGPThrs.fModelThr = float(fModelThr);
 
     double fDataThr;
-    if(private_node.getParam("insac_data", fDataThr))
+    if(private_node.getParam("gp/insac_data", fDataThr))
         m_oGPThrs.fDataThr = float(fDataThr);
 
+    float fSensorHeigh;
+    if(private_node.getParam("gp/gp_sensor_heigh", fSensorHeigh))
+        m_sensor_heigh = float(fSensorHeigh);
+    
 }
 /*************************************************
 Function: OutputGroundPoints
@@ -513,7 +519,7 @@ void GroundExtraction::HandlePointClouds(const sensor_msgs::PointCloud2 & vLaser
     //OutputGroundPoints(vGroundCloud, vLaserData.header.stamp);
 }
 
-void GroundExtraction::groundExtract(pcl::PointCloud<pcl::PointXYZ>& vInputCloud,
+void GroundExtraction::groundExtract(const pcl::PointCloud<pcl::PointXYZ>& vInputCloud,
                                      pcl::PointCloud<pcl::PointXYZ>& vGroundCloud,
                                      pcl::PointCloud<pcl::PointXYZ>& vObstacleCloud,
                                      pcl::PointCloud<pcl::PointXYZ>& vBoundCloud) {
@@ -522,13 +528,15 @@ void GroundExtraction::groundExtract(pcl::PointCloud<pcl::PointXYZ>& vInputCloud
     vObstacleCloud.clear();
     vBoundCloud.clear();
 
+    pcl::PointCloud<pcl::PointXYZ> process_Cloud;
+    pcl::copyPointCloud(vInputCloud, process_Cloud);
 
-    for(int i = 0; i != vInputCloud.size(); ++i ){
+    for(int i = 0; i != process_Cloud.size(); ++i ){
         
-        if (std::isnan(vInputCloud.points[i].x) || std::isnan(vInputCloud.points[i].y) || 
-            std::isnan(vInputCloud.points[i].z)) {
+        if (std::isnan(process_Cloud.points[i].x) || std::isnan(process_Cloud.points[i].y) || 
+            std::isnan(process_Cloud.points[i].z)) {
             
-            vInputCloud.points[i] = pcl::PointXYZ(0, 0, 0);
+            process_Cloud.points[i] = pcl::PointXYZ(0, 0, 0);
             continue;
         }
 
@@ -538,12 +546,12 @@ void GroundExtraction::groundExtract(pcl::PointCloud<pcl::PointXYZ>& vInputCloud
     //a class to divide point clouds into the given number of sectors
     DivideSector oSectorDivider(m_oGPThrs.iSector_num);
     //compute the corresponding trajectory point
-    pcl::PointXYZ oCurrentTrajP(0, 0, -1.79);
+    pcl::PointXYZ oCurrentTrajP(0, 0, -m_sensor_heigh);
     oSectorDivider.SetOriginPoint(oCurrentTrajP);
     
     //preparation
     std::vector<std::vector<int> > oPointSecIdxs;///<point index reorganization according to sectors
-    std::vector<std::vector<GroundFeature> > vGroundFeatures = oSectorDivider.ComputePointSectorIdxs(vInputCloud, oPointSecIdxs);
+    std::vector<std::vector<GroundFeature> > vGroundFeatures = oSectorDivider.ComputePointSectorIdxs(process_Cloud, oPointSecIdxs);
     
     std::vector<std::vector<int> > vAllGroundRes;///<point value according to oPointSecIdxs
     for (int i = 0; i != vGroundFeatures.size(); ++i) {
@@ -642,10 +650,10 @@ void GroundExtraction::groundExtract(pcl::PointCloud<pcl::PointXYZ>& vInputCloud
     auto gp_end = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> dur = gp_end - gp_start;
     std::cout << "gp time: " << dur.count() << " ms  " 
-              << "cloud_size: " << vInputCloud.size() <<  std::endl;
+              << "cloud_size: " << process_Cloud.size() <<  std::endl;
 
     //assigment of result in whole point clouds
-    std::vector<int> vCloudRes(vInputCloud.points.size(),0);
+    std::vector<int> vCloudRes(process_Cloud.points.size(),0);
     //assignment in whole point clouds
     for (int is = 0; is != oPointSecIdxs.size(); ++is) {
         for (int j = 0; j != oPointSecIdxs[is].size(); ++j) {
@@ -659,7 +667,7 @@ void GroundExtraction::groundExtract(pcl::PointCloud<pcl::PointXYZ>& vInputCloud
     //new a boundary class
     Boundary oBounder;
     //input the segment labels
-    oBounder.GetSegmentClouds(vInputCloud.makeShared(), vCloudRes);
+    oBounder.GetSegmentClouds(process_Cloud.makeShared(), vCloudRes);
     //compute boundary point
     oBounder.ComputeBoundary();
     //output the boundary cloud
@@ -670,15 +678,15 @@ void GroundExtraction::groundExtract(pcl::PointCloud<pcl::PointXYZ>& vInputCloud
         //if point is a ground point
         if( vCloudRes[i] == 1){
             //take data
-            vGroundCloud.push_back(vInputCloud.points[i]);
+            vGroundCloud.push_back(process_Cloud.points[i]);
         //if point is an obstacle point
         }else if(vCloudRes[i] == -1){
             //take data
-            vObstacleCloud.push_back(vInputCloud.points[i]);
+            vObstacleCloud.push_back(process_Cloud.points[i]);
         //if point is an boundary point
         }else if(  vCloudRes[i] == 2)
             //take data
-            vBoundCloud.push_back(vInputCloud.points[i]);
+            vBoundCloud.push_back(process_Cloud.points[i]);
 
     }//end for i
 

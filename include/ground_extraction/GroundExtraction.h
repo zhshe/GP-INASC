@@ -45,7 +45,7 @@ class GroundExtraction{
 public:
     GroundExtraction(ros::NodeHandle & node, 
                      ros::NodeHandle & private_node);
-    void groundExtract(pcl::PointCloud<pcl::PointXYZ>& cloud_in,
+    void groundExtract(const pcl::PointCloud<pcl::PointXYZ>& cloud_in,
                        pcl::PointCloud<pcl::PointXYZ>& cloud_obstacle,
                        pcl::PointCloud<pcl::PointXYZ>& cloud_ground,
                        pcl::PointCloud<pcl::PointXYZ>& cloud_bound);                
@@ -122,6 +122,7 @@ private:
     //the history data among a given secs of trajectory points
     CircularVector<TrajectoryPoint> vTrajHistory;
 
+    float m_sensor_heigh = 0;
 };
 
 #endif

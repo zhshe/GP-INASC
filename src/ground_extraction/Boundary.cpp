@@ -1,4 +1,4 @@
-#include "Boundary.h"
+#include "ground_extraction/Boundary.h"
 
 /*************************************************
 Function: Boundary

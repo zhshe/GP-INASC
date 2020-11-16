@@ -1,4 +1,4 @@
-#include "INSAC.h"
+#include "ground_extraction/INSAC.h"
 
 /*************************************************
 Function: INSAC

@@ -8,8 +8,6 @@
 
 int main() {
 
-	//
-
 	GaussianProcessRegression<float> gpr(1, 1);
 	gpr.SetHyperParams(1.16, 1.268, 0.3);
 	typedef Eigen::Matrix<float, 1, 1> input_type;

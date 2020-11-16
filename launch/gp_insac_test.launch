@@ -19,25 +19,26 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 <launch>
 
 <!-- hesai_time_modifier node in record_pointclouds pkg-->
-    <node name="gp_insac_node_test" pkg="gp_insac" type="gp_insac_node_test" output="screen">
+    <node name="gp_insac_node_test" pkg="gp_insac" type="gp_insac_node_test" output="screen" launch-prefix = "xterm -e gdb --args">
 
         <!-- system parameters-->	
         <param name="Output_path" type="string" value="/home/zs/zs/gp_insac/data/" />
         <param name="lidar_topic" type="string" value="/kitti/velo/pointcloud" />
         <!--input parameters-->	
-        <param name="sampling_number"  type="int" value="5" />
         <param name="traj_topic" type="string" value="/integrated_to_init" />
         <!-- GP-INSAC method parameters-->
         <!-- getParam does not have float type--> 
-        <param name="sector_num" type="int" value="360"/>
-        <param name="seed_radius" type="double" value="5.5"/>
-        <param name="seed_lower" type="double" value="-0.5"/>
-        <param name="seed_upper" type="double" value="0.5"/>
-        <param name="gp_lscale" type="double" value="28.01"/>
-        <param name="gp_sigmaF" type="double" value="1.76"/>
-        <param name="gp_sigmaN" type="double" value="0.12"/>
-        <param name="insac_model" type="double" value="0.2"/>
-        <param name="insac_data" type="double" value="0.8"/>
+        <param name="gp/sampling_number"  type="int" value="5" />
+        <param name="gp/sector_num" type="int" value="360"/>
+        <param name="gp/seed_radius" type="double" value="15.5"/>
+        <param name="gp/seed_lower" type="double" value="-0.5"/>
+        <param name="gp/seed_upper" type="double" value="0.5"/>
+        <param name="gp/gp_lscale" type="double" value="28.01"/>
+        <param name="gp/gp_sigmaF" type="double" value="1.76"/>
+        <param name="gp/gp_sigmaN" type="double" value="0.12"/>
+        <param name="gp/insac_model" type="double" value="0.2"/>
+        <param name="gp/insac_data" type="double" value="1.0"/>
+        <param name="gp/gp_sensor_heigh" type="double" value="1.79"/>
     </node>
 
 </launch>

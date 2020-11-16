@@ -5,7 +5,7 @@
 #include <pcl/io/pcd_io.h>
 #include <chrono>
 
-#include "../ground_extraction/GroundExtraction.h"
+#include "ground_extraction/GroundExtraction.h"
 
 int main(int argc, char** argv) {
     
