@@ -15,8 +15,8 @@ int main(int argc, char** argv) {
  
     GroundExtraction ground_extraction(node,privateNode);
     ROS_INFO("------TEST-----------");
-    std::string cloud_path = "/home/zs/zs/kitti/data/cloud_origin.ply";
-    std::string cloud_save = "/home/zs/zs/kitti/data/cloud_";
+    std::string cloud_path = "/media/zs/TOSHIBA\ EXT/rosdata/cloud/ground/test/gps/40.ply";
+    std::string cloud_save = "/home/zs/zs/kitti/data/40_";
     ROS_INFO("cloud_path: %s", cloud_path.c_str());
     ROS_INFO("cloud_path: %s", cloud_save.c_str());
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);

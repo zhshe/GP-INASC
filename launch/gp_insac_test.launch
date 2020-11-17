@@ -38,7 +38,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
         <param name="gp/gp_sigmaN" type="double" value="0.12"/>
         <param name="gp/insac_model" type="double" value="0.2"/>
         <param name="gp/insac_data" type="double" value="1.0"/>
-        <param name="gp/gp_sensor_heigh" type="double" value="1.79"/>
+        <param name="gp/gp_sensor_heigh" type="double" value="0.72"/>
     </node>
 
 </launch>
